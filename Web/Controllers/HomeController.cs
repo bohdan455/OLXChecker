@@ -29,6 +29,7 @@ namespace Web.Controllers
             try
             {
                 await _productUriService.Add(olxSubscribe.ToProductDto());
+                _logger.LogInformation("New user with email: {0} and url {1}", olxSubscribe.Email, olxSubscribe.Url);
             }
             catch(Exception ex)
             {
