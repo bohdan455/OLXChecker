@@ -16,5 +16,7 @@ namespace Database.Entities
         public string EmailAddress { get; set; } = string.Empty;
         [Required]
         public int ProductId { get; set; }
+        [Required]
+        public bool IsConfirmed { get; set; }
     }
 }

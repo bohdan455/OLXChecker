@@ -13,6 +13,7 @@ namespace Web.Extensions
             services.AddTransient<IPriceCheckerService, PriceCheckerService>();
             services.AddTransient<IEmailService, EmailService>(emailService => 
                 new EmailService(EmailSettings.SmptServer,EmailSettings.Username,EmailSettings.Password,EmailSettings.Email));
+            services.AddTransient<IEmailConfirmationService, EmailConfirmationService>();
             return services;
         }
     }

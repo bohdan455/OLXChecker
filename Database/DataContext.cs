@@ -12,6 +12,7 @@ namespace Database
     {
         public DbSet<Email> Emails { get; set; }
         public DbSet<Product> Products { get; set; }
+        public DbSet<EmailConfirmationCode> EmailConfirmationCodes { get; set; }
         public DataContext(DbContextOptions options) : base(options)
         {
 

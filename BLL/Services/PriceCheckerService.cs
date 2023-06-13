@@ -25,6 +25,7 @@ namespace BLL.Services
         }
         public async Task Start()
         {
+            Thread.Sleep(PriceCheckerSettings.DelayInMilliseconds);
             while (true)
             {
                 using (var _context = _dbContextFactory.CreateDbContext())
@@ -42,7 +43,8 @@ namespace BLL.Services
                                 await _context.SaveChangesAsync();
                                 foreach (var email in product.Emails)
                                 {
-                                    await _emailService.SendEmailAsync(email.EmailAddress, "The price has changed", $"The price for product {product.Url} has changed from {product.LastPrice} to {currentPrice}");
+                                    if(email.IsConfirmed)
+                                        await _emailService.SendEmailAsync(email.EmailAddress, "The price has changed", $"The price for product {product.Url} has changed from {product.LastPrice} to {currentPrice}");
                                 }
                             }
                         }
@@ -55,7 +57,6 @@ namespace BLL.Services
                     }
                 }
                 _logger.LogInformation("Checking has completed");
-                Thread.Sleep(PriceCheckerSettings.DelayInMilliseconds);
             }
         }
     }
