@@ -22,6 +22,7 @@ builder.Services.AddDbContext<DataContext>(options =>
     var config = builder.Configuration;
     options.UseSqlServer(config.GetConnectionString("Default"));
 });
+
 builder.Services.AddWebServices();
 var app = builder.Build();
 
@@ -41,12 +42,5 @@ app.UseAuthorization();
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
-
-//// Start checking price
-//new Thread(() =>
-//{
-//    app.Services.GetService<IPriceCheckerService>().Start();
-//}).Start();
-
 
 app.Run();

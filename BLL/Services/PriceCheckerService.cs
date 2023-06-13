@@ -1,12 +1,14 @@
 ﻿using BLL.Services.Interfaces;
 using Database;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Resources;
+using System.Threading;
 
 namespace BLL.Services
 {
-    public class PriceCheckerService : IPriceCheckerService
+    public class PriceCheckerService : BackgroundService
     {
         private readonly IDbContextFactory<DataContext> _dbContextFactory;
         private readonly IOlxService _olxService;
@@ -23,11 +25,11 @@ namespace BLL.Services
             _emailService = emailService;
             _logger = logger;
         }
-        public async Task Start()
+        protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
-            Thread.Sleep(PriceCheckerSettings.DelayInMilliseconds);
-            while (true)
+            while (!stoppingToken.IsCancellationRequested)
             {
+                _logger.LogInformation("Start checking price");
                 using (var _context = _dbContextFactory.CreateDbContext())
                 {
                     var products = _context.Products;
@@ -43,7 +45,7 @@ namespace BLL.Services
                                 await _context.SaveChangesAsync();
                                 foreach (var email in product.Emails)
                                 {
-                                    if(email.IsConfirmed)
+                                    if (email.IsConfirmed)
                                         await _emailService.SendEmailAsync(email.EmailAddress, "The price has changed", $"The price for product {product.Url} has changed from {product.LastPrice} to {currentPrice}");
                                 }
                             }
@@ -56,7 +58,8 @@ namespace BLL.Services
                         }
                     }
                 }
-                _logger.LogInformation("Checking has completed");
+                _logger.LogInformation("Checking price has completed");
+                await Task.Delay(PriceCheckerSettings.DelayInMilliseconds, stoppingToken);
             }
         }
     }
